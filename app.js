@@ -9,8 +9,8 @@ const enableGlobalErrorLogging = process.env.ENABLE_GLOBAL_ERROR_LOGGING === 'tr
 
 // create the Express app
 const app = express();
-
-
+const routes = require('./routes')
+app.use('/api', routes)
 const Sequelize = require('sequelize');
 const sequelize = require('./models/index.js').sequelize;
 

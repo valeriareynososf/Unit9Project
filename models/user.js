@@ -10,54 +10,52 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+        // User.associate = (models) => {
+            User.hasMany(models.Course, { foreignKey: 'userId' });
+        //   }
     }
   }
   User.init({
     firstName: {
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'Please provide a value for "first name"',
-        }
-      },
+        allowNull: false,
+    //   validate: {
+    //     notEmpty: {
+    //       msg: 'Please provide a value for "first name"',
+    //     }
+    //   },
     },
     lastName: { 
       type: DataTypes.STRING,
-      allowNull: false,
-      validate: {
-        notEmpty: {
-          msg: 'Please provide a value for "last name"',
-        }
-      },
+     allowNull: false,
+    //   validate: {
+    //     notEmpty: {
+    //       msg: 'Please provide a value for "last name"',
+    //     }
+    //   },
     },
     emailAddress: { 
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-          notEmpty: {
-            msg: 'Please provide a value for "email address"',
-          }
-        },
+        // validate: {
+        //   notEmpty: {
+        //     msg: 'Please provide a value for "email address"',
+        //   }
+        // },
       },
     password: { 
         type: DataTypes.STRING,
         allowNull: false,
-        validate: {
-          notEmpty: {
-            msg: 'Please provide a value for "password"',
-          }
-        },
+        // validate: {
+        //   notEmpty: {
+        //     msg: 'Please provide a value for "password"',
+        //   }
+        // },
       },
   }, {
     sequelize,
     modelName: 'User',
   });
-
-  User.associate = (models) => {
-    User.hasMany(models.Course, { foreignKey: 'userId' });
-  }
 
   return User;
 };
