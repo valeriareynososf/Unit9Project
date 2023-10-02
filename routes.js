@@ -6,7 +6,7 @@ const { authenticateUser } = require('./middleware/auth-user');
 /* GET / return all properties and values for the currently authenticated User */
 router.get('/users', authenticateUser, asyncHandler(async (req, res) => {
     const user = await req.currentUser;
-    res.status(200).json({ name: user.firstName, username: user.emailAddress })
+    res.status(200).json({ id: user.id, fristName: user.firstName, lastName: user.lastName, emailAddress: user.emailAddress })
 }));
 
 /* POST / route that will create a new user */
@@ -32,7 +32,8 @@ router.get('/courses', asyncHandler(async (req, res) => {
         include: {
             model: User,
             attributes: ['id', 'firstName', 'lastName', 'emailAddress']
-        }
+        },
+        attributes: { exclude: ['createdAt', 'updatedAt'] }
     })
     res.status(200).json(courses)
 }));
@@ -43,19 +44,20 @@ router.get('/courses/:id', asyncHandler(async (req, res) => {
         include: {
             model: User,
             attributes: ['id', 'firstName', 'lastName', 'emailAddress']
-        }
+        },
+        attributes: { exclude: ['createdAt', 'updatedAt'] }
     });
     res.status(200).json(course)
 }));
 
 /* POST/ route that will create a new course */
-router.post('/courses', asyncHandler(async (req, res) => {
+router.post('/courses', authenticateUser, asyncHandler(async (req, res) => {
 
     try {
         const newCourse = await Course.create(req.body);
         res.location(`/courses/${newCourse.id}`).status(201).end();
     } catch (error) {
-        console.log("error:", error)
+
         if (error.name === 'SequelizeValidationError') {
             const errors = error.errors.map(err => err.message);
             res.status(400).json({ errors })
@@ -74,12 +76,12 @@ router.put('/courses/:id', authenticateUser, asyncHandler(async (req, res) => {
         const user = await req.currentUser;
         const course = await Course.findByPk(req.params.id);
 
-        if (course.userId === user.id) {
-            course.update(req.body)
-            res.status(204).end();
-        } else {
-            res.status(403).end();
-        }
+        if (course.userId !== user.id) {
+            res.status(403).end();  
+        } 
+
+        await course.update(req.body)
+        res.status(204).end();
 
     } catch (error) {
         console.log("error:", error)
