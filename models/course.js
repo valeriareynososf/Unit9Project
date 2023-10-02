@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
         // Course.associate = (models) => {
-            Course.belongsTo(models.User, { foreignKey: 'userId' });
+           // Course.belongsTo(models.User, { foreignKey: 'userId' });
          // }
     }
   }
@@ -36,30 +36,18 @@ module.exports = (sequelize, DataTypes) => {
     },
     estimatedTime: { 
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: {
-            msg: 'Please provide a value for "email address"',
-          }
-        },
       },
     materialsNeeded: { 
         type: DataTypes.STRING,
-        allowNull: false,
-        validate: {
-          notEmpty: {
-            msg: 'Please provide a value for "password"',
-          }
-        },
       },
   }, {
     sequelize,
     modelName: 'Course',
   });
 
-//   Course.associate = (models) => {
-//     Course.belongsTo(models.User, { foreignKey: 'userId' });
-//   }
+  Course.associate = (models) => {
+    Course.belongsTo(models.User, { foreignKey: 'userId' });
+  }
 
   return Course;
 };

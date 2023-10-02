@@ -1,7 +1,10 @@
 'use strict';
 const {
-  Model
+    Model
 } = require('sequelize');
+
+const bcrypt = require('bcryptjs')
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -10,52 +13,65 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-        // User.associate = (models) => {
-            User.hasMany(models.Course, { foreignKey: 'userId' });
-        //   }
+        // // User.associate = (models) => {
+        //     User.hasMany(models.Course, { foreignKey: 'userId' });
+        // //   }
     }
   }
   User.init({
     firstName: {
       type: DataTypes.STRING,
         allowNull: false,
-    //   validate: {
-    //     notEmpty: {
-    //       msg: 'Please provide a value for "first name"',
-    //     }
-    //   },
+      validate: {
+        notEmpty: {
+          msg: 'Please provide a value for "first name"',
+        }
+      },
     },
     lastName: { 
       type: DataTypes.STRING,
      allowNull: false,
-    //   validate: {
-    //     notEmpty: {
-    //       msg: 'Please provide a value for "last name"',
-    //     }
-    //   },
+      validate: {
+        notEmpty: {
+          msg: 'Please provide a value for "last name"',
+        }
+      },
     },
     emailAddress: { 
         type: DataTypes.STRING,
         allowNull: false,
-        // validate: {
-        //   notEmpty: {
-        //     msg: 'Please provide a value for "email address"',
-        //   }
-        // },
+        unique: {
+            msg: "This email address already exists."
+        },
+        validate: {
+          notEmpty: {
+            msg: 'Please provide a value for "email address"',
+          },
+          isEmail: {
+            msg: 'Please provide a valid mail address',
+          },
+        },
       },
     password: { 
         type: DataTypes.STRING,
         allowNull: false,
-        // validate: {
-        //   notEmpty: {
-        //     msg: 'Please provide a value for "password"',
-        //   }
-        // },
+        set (val) {
+            const hashPassword = bcrypt.hashSync(val, 10);
+            this.setDataValue('password', hashPassword)
+        },
+        validate: {
+          notEmpty: {
+            msg: 'Please provide a value for "password"',
+          }
+        },
       },
   }, {
     sequelize,
     modelName: 'User',
   });
+    User.associate = (models) => {
+        User.hasMany(models.Course, { foreignKey: 'userId' });
+    }
 
   return User;
 };
